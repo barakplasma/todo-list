@@ -13,4 +13,4 @@ COPY --from=builder /usr/src/target/release/todolist-cli /app/todolist-cli
 
 # Define the entrypoint for the container
 WORKDIR /app
-ENTRYPOINT ["/app/todolist-cli"]
+ENTRYPOINT ["/app/todolist-cli start"]
