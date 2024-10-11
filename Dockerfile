@@ -6,7 +6,7 @@ WORKDIR /usr/src/
 COPY Cargo.lock Cargo.toml ./
 COPY migration/Cargo.toml ./migration/
 
-RUN cargo build --release --target=aarch64-unknown-linux-musl
+RUN cargo build --release
 
 # Create a separate image for the final build
 FROM alpine:latest AS runner
