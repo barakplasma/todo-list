@@ -22,7 +22,7 @@ RUN cargo chef cook --recipe-path recipe.json
 COPY . .
 RUN cargo build --release
 
-from debian
+from gcr.io/distroless/cc-debian12
 # Copy only the compiled binary
 COPY --from=builder /usr/src/target/release/todolist-cli /app/todolist-cli
 
