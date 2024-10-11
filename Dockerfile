@@ -22,10 +22,11 @@ RUN cargo chef cook --recipe-path recipe.json
 COPY . .
 RUN cargo build --release
 
-from gcr.io/distroless/cc-debian12
+FROM gcr.io/distroless/cc-debian12
+WORKDIR /app
+
 # Copy only the compiled binary
-COPY --from=builder /usr/src/target/release/todolist-cli /app/todolist-cli
+COPY --from=builder /usr/src/target/release/todolist-cli todolist-cli
 
 # Define the entrypoint for the container
-WORKDIR /app
-ENTRYPOINT ["/app/todolist-cli start"]
+ENTRYPOINT ["/app/todolist-cli", "start"]
