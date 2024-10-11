@@ -20,7 +20,7 @@ RUN cargo chef cook --recipe-path recipe.json
 
 # Build the whole project
 COPY . .
-RUN cargo build
+RUN cargo build --release
 
 from debian
 # Copy only the compiled binary
