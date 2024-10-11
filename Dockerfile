@@ -1,16 +1,28 @@
-FROM rust:1.74-slim AS builder
+FROM rust:1 as planner
+RUN cargo install cargo-chef
 
-# Cache cargo dependencies
-WORKDIR /usr/src/
+WORKDIR /app
+# Copy the whole project
+COPY . .
+# Prepare a build plan ("recipe")
+RUN cargo chef prepare --recipe-path recipe.json
 
-COPY Cargo.lock Cargo.toml ./
-COPY migration/Cargo.toml ./migration/
+FROM rust:1 AS builder
+workdir /usr/src/
+RUN cargo install cargo-chef
 
-RUN cargo build --release
+# Copy the build plan from the previous Docker stage
+COPY --from=planner /app/recipe.json recipe.json
 
-# Create a separate image for the final build
-FROM alpine:latest AS runner
+# Build dependencies - this layer is cached as long as `recipe.json`
+# doesn't change.
+RUN cargo chef cook --recipe-path recipe.json
 
+# Build the whole project
+COPY . .
+RUN cargo build
+
+from debian
 # Copy only the compiled binary
 COPY --from=builder /usr/src/target/release/todolist-cli /app/todolist-cli
 
