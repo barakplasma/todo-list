@@ -6,4 +6,4 @@ COPY . .
 
 RUN cargo build --release
 
-ENTRYPOINT ["/usr/src/todolist-cli"]
+ENTRYPOINT ["/usr/src/target/release/todolist-cli"]
