@@ -1,32 +1,20 @@
-FROM rust:1.74 as planner
-RUN cargo install cargo-chef
-
+FROM lukemathwalker/cargo-chef:latest-rust-1.74 AS chef
 WORKDIR /app
-# Copy the whole project
+
+FROM chef AS planner
 COPY . .
-# Prepare a build plan ("recipe")
 RUN cargo chef prepare --recipe-path recipe.json
 
-FROM rust:1.74 AS builder
-workdir /usr/src/
-RUN cargo install cargo-chef
-
-# Copy the build plan from the previous Docker stage
+FROM chef AS builder 
 COPY --from=planner /app/recipe.json recipe.json
-
-# Build dependencies - this layer is cached as long as `recipe.json`
-# doesn't change.
-RUN cargo chef cook --recipe-path recipe.json
-
-# Build the whole project
+# Build dependencies - this is the caching Docker layer!
+RUN cargo chef cook --release --recipe-path recipe.json
+# Build application
 COPY . .
-RUN cargo build --release
+RUN cargo build --release --bin app
 
-FROM gcr.io/distroless/cc-debian12
+# We do not need the Rust toolchain to run the binary!
+FROM gcr.io/distroless/cc-debian12 AS runtime
 WORKDIR /app
-
-# Copy only the compiled binary
-COPY --from=builder /usr/src/target/release/todolist-cli todolist-cli
-
-# Define the entrypoint for the container
-ENTRYPOINT ["/app/todolist-cli", "start"]
+COPY --from=builder /app/target/release/app /usr/local/bin
+ENTRYPOINT ["/usr/local/bin/app","start"]
