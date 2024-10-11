@@ -1,4 +1,4 @@
-FROM rust:1 as planner
+FROM rust:1.74 as planner
 RUN cargo install cargo-chef
 
 WORKDIR /app
@@ -7,7 +7,7 @@ COPY . .
 # Prepare a build plan ("recipe")
 RUN cargo chef prepare --recipe-path recipe.json
 
-FROM rust:1 AS builder
+FROM rust:1.74 AS builder
 workdir /usr/src/
 RUN cargo install cargo-chef
 
