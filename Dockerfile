@@ -4,7 +4,7 @@ FROM rust:1.74-slim AS builder
 WORKDIR /usr/src/
 
 COPY Cargo.lock Cargo.toml ./
-COPY migration/Cargo.lock migration/Cargo.toml ./migration/
+COPY migration/Cargo.toml ./migration/
 
 RUN cargo build --release --target=aarch64-unknown-linux-musl
 
