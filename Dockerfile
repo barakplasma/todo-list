@@ -16,5 +16,6 @@ RUN cargo build --release --bin app
 # We do not need the Rust toolchain to run the binary!
 FROM gcr.io/distroless/cc-debian12 AS runtime
 WORKDIR /app
+COPY --from=builder /app/config /usr/local/bin/config
 COPY --from=builder /app/target/release/app /usr/local/bin
 ENTRYPOINT ["/usr/local/bin/app","start"]
